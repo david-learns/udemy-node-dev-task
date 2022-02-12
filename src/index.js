@@ -5,7 +5,6 @@ const taskRouter = require('./routers/task');
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-const host = process.env.HOST || '127.0.0.1';
 
 
 app.use(express.json());
@@ -13,7 +12,7 @@ app.use(userRouter);
 app.use(taskRouter);
 
 
-const server = app.listen(port, host, () => {
+const server = app.listen(port, () => {
     console.log('server is running: ', server.address().address.concat(':', server.address().port));
 });
 

@@ -25,11 +25,13 @@ const upload = multer({
 router.post('/users', async (req, res) => {
 
     try {
+
         const user = new User(req.body);
-        sendWelcomeEmail(user.email, user.name);
         const token = await user.generateAuthToken();
         await user.save();
+        sendWelcomeEmail(user.email, user.name);
         res.status(201).send({ user, token });
+
     } catch (err) {
         res.status(400).send(err);
     }
@@ -40,9 +42,11 @@ router.post('/users', async (req, res) => {
 router.post('/users/login', async (req, res) => {
 
     try {
+
         const user = await User.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
         res.send({ user, token });
+
     } catch (err) {
         res.status(400).send({ gandalf: err.message });
     }
@@ -52,11 +56,13 @@ router.post('/users/login', async (req, res) => {
 router.post('/users/logout', auth, async (req, res) => {
 
     try {
+
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.token;
         });
         await req.user.save();
         res.send();
+
     } catch (err) {
         res.status(500).send();
     }
@@ -67,9 +73,11 @@ router.post('/users/logout', auth, async (req, res) => {
 router.post('/users/logoutAll', auth, async (req, res) => {
 
     try {
+
         req.user.tokens = [];
         await req.user.save();
         res.send();
+
     } catch (err) {
         res.status(500).send();
     }
@@ -104,9 +112,11 @@ router.patch('/users/me', auth, async (req, res) => {
 router.delete('/users/me', auth, async (req, res) => {
 
     try {
+
         await req.user.remove();
         sendCancelEmail(req.user.email, req.user.name);
         res.send(req.user);
+        
     } catch (err) {
         res.status(500).send({ error: err.message });
     }
@@ -129,9 +139,11 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
 router.delete('/users/me/avatar', auth, async (req, res) => {
 
     try {
+
         req.user.avatar = null;
         await req.user.save();
         res.send();
+
     } catch (err) {
         res.status(500).send({ error: err.message });
     }
@@ -142,6 +154,7 @@ router.delete('/users/me/avatar', auth, async (req, res) => {
 router.get('/users/:id/avatar', async (req, res) => {
 
     try {
+        
         const user = await User.findById(req.params.id);
         if (!user || !user.avatar) {
             throw new Error();
@@ -149,6 +162,7 @@ router.get('/users/:id/avatar', async (req, res) => {
 
         res.set('Content-Type', 'image/png');
         res.send(user.avatar);
+        
     } catch (err) {
         res.status(404).send();
     }

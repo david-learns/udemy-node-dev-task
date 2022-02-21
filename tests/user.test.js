@@ -29,6 +29,52 @@ test('should sign up new user', async () => {
     expect(user.password).not.toBe('testuser');
 });
 
+test('should not sign up new user without name field', async () => {
+    const response = await request(app).post('/users').send({
+        email: 'another.test.email@example.com',
+        password: 'nonametestuser'
+    }).expect(400);
+});
+
+test('should not sign up new user when submitted email already exists in db', async () => {
+    const response = await request(app).post('/users').send({
+        name: 'samuemail test user',
+        email: 'david.dev.train@gmail.com',
+        password: 'testuser'
+    }).expect(400);
+});
+
+test('should not sign up new user without email field', async () => {
+    const response = await request(app).post('/users').send({
+        name: 'anothutest user',
+        password: 'short'
+    }).expect(400);
+});
+
+test('should not sign up new user with invalid email', async () => {
+    const response = await request(app).post('/users').send({
+        name: 'anothutest user',
+        email: 'example.com',
+        password: 'short'
+    }).expect(400);
+});
+
+test('should not sign up new user where password length is less than 6 chars', async () => {
+    const response = await request(app).post('/users').send({
+        name: 'anothutest user',
+        email: 'anothutest.user@example.com',
+        password: 'short'
+    }).expect(400);
+});
+
+test('should not sign up new user where password contains \'password\'', async () => {
+    const response = await request(app).post('/users').send({
+        name: 'anothutest user',
+        email: 'anothutest.user@example.com',
+        password: '22password22'
+    }).expect(400);
+});
+
 
 test('should fail to login nonexistent user', async () => {
     await request(app).post('/users/login').send({
